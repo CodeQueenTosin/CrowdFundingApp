@@ -2,21 +2,39 @@
 
 pragma solidity   0.8.18;
 
+import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
+
 contract FundMe {
 
+uint256 public  minimumUsd =   5E18;
+
 function  Fund()  public payable {
-   //Allow users  send money
-   // Have a minimum value to be sent in USD
-    //use paaybale lkeu
-    //msg.value
-    require(msg.value >  1e18, "didint send enought ether")    ;
+    
+require(getConversionRate(msg.value) >= minimumUsd, "didnt send enough ETH");
+  
+}
 
-} 
+function getPrice() public view returns (uint256) {
+
+AggregatorV3Interface priceFeed = AggregatorV3Interface(0x694AA1769357215DE4FAC081bf1f309aDC325306);
+        (, int256 price, , , ) = priceFeed.latestRoundData();
+        return uint256(price * 1e10);
+}
 
 
+function getConversionRate(uint256 ethAmount) public view returns(uint256) {
+   
+   uint256 ethPrice = getPrice();
+   uint256 ethAmountInUsd = (ethPrice * ethAmount)/ 1e18;
+   return ethAmountInUsd;
 
-//function Withdraw  () public {
+}
 
-//s}
+function  getVersion() public  view returns (uint256){   
+
+return  AggregatorV3Interface(0x694AA1769357215DE4FAC081bf1f309aDC325306).version();  
+
+}
+
 
 }
